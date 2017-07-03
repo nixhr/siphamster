@@ -1,6 +1,12 @@
 # siphamster
 SIP traffic collector and analyzer
 
+# files
+
+`sipcollector.pl` sniffs the network interface for traffic on port 5060 and stores it to the database
+`sipanalyzer.pl` analyzes the traffic from db
+`sipprunedb.pl` prunes records older than a number of hours
+
 # Installation
 
 1. `git clone https://github.com/nixhr/siphamster`
@@ -18,7 +24,8 @@ SIP traffic collector and analyzer
 # Usage 
 
 1. start `sipcollector.pl [-v]` 
-2. use sipanalyzer.pl like:
+2. dont forget to prune your database regularly, so run `sipprunedb.pl -h 24` from cron
+3. use sipanalyzer.pl like:
 
 ~~~~
 ./sipanalyzer.pl options
