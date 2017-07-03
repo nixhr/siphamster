@@ -1,0 +1,7 @@
+MYSQL_HOST = localhost
+MYSQL_DB = dbname
+MYSQL_PORT = 3306
+MYSQL_USER = dbuser
+MYSQL_PASS = dbpass
+MY_IP_ADDRESS = myipaddress
+PCAP_DEV = nflog:6
