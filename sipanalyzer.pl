@@ -44,7 +44,7 @@ $dbh = DBI->connect("DBI:mysql:database=$dbName;host=$dbHost",
 # r - find by user or peer
 # s - print all sql statements for debugging
 
-my $opt_string = 'n:vt:mipfa:r';
+my $opt_string = 'n:vt:mipfa:rs';
 getopts( "$opt_string", \%opt ) or usage();
 
 $number = $opt{n} if $opt{n};
