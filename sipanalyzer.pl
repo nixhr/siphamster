@@ -17,7 +17,7 @@ use Getopt::Std;
 use Term::ANSIColor;
 use Config::Tiny;
 
-$Config = Config::Tiny->read( './siphamster.conf', 'utf8' );
+$Config = Config::Tiny->read( '/etc/siphamster.conf', 'utf8' );
 
 my $dbHost           = $Config->{_}->{MYSQL_HOST}              =~ s/"//rg;
 my $dbName           = $Config->{_}->{MYSQL_DB}                =~ s/"//rg;
