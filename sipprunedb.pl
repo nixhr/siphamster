@@ -9,7 +9,7 @@ use DateTime;
 use Config::Tiny;
 use Getopt::Std;
 
-$Config = Config::Tiny->read( './siphamster.conf', 'utf8' );
+$Config = Config::Tiny->read( '/home/nix/work/siphamster/siphamster.conf', 'utf8' );
 
 my $dbHost           = $Config->{_}->{MYSQL_HOST}              =~ s/"//rg;
 my $dbName           = $Config->{_}->{MYSQL_DB}                =~ s/"//rg;

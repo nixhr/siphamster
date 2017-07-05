@@ -138,7 +138,8 @@ sub print_user_traffic {
   while( ($id, $timeGMT, $srcAddress, $dstAddress, $sipID, $sipFrom, $sipTo, $sipUserAgent, $sipCSeq, $sipCommand, $sipData) = $sth->fetchrow_array() ) {
     $sipCommand =~ s/;.* / / if ! $opt{f};
   #  printf ("%-25s %-44s %-20s %20s\n", "Time", $foundUsersIP[$chosenID], $myIP, "CSeq") if ($pageLine == 0);
-    if ( $srcAddress =~ /^$foundUsersIP[$chosenID]$/ ) {
+  #  if ( $srcAddress =~ /^$foundUsersIP[$chosenID]$/ ) {
+    if ( $srcAddress =~ /^${myIP}$/ ) {
      printf colored ("%-25s %-18s %-64s %-18s %-20s %-64s\n", "green"), $timeGMT, $srcAddress, "$sipCommand  ---->", "   $dstAddress", "CSeq:$sipCSeq", $sipID; 
 #    printf ("%-25s %-18s %5s %-18s  %-64s\n", $timeGMT , $srcAddress, " -> ", $dstAddress,  $sipCommand);
     } else {
@@ -257,24 +258,39 @@ sub analyze_calls {
 }
 
 sub print_output { 
+
   $sql="SELECT id, timeGMT, timeMicroSec, srcAddress, dstAddress, sipID, sipFrom, sipTo, sipUserAgent, sipCSeq, sipCommand, sipData FROM sip_log where sipID in ($sipIdList) ORDER BY id";
   print "$sql\n" if $sql_debug; 
   $sth = $dbh->prepare("$sql")|| fatal_error("*** Database error: $DBI::errstr") ;
   $sth->execute()|| fatal_error("*** Database error: $DBI::errstr") ;
-  while( ($id, $timeGMT, $timeMicroSec, $srcAddress, $dstAddress, $sipID, $sipFrom, $sipTo, $sipUserAgent, $sipCSeq, $sipCommand, $sipData) = $sth->fetchrow_array() ) {
-    $sipCommand =~ s/;.* / / if ! $opt{f};
-    if ( $opt{p} ) {
-      if ( ! $opt{m} ){
-        printf colored ("%-31s %-15s %4s %-18s %-15s %5s %-15s %-12s %-64.64s %-64s\n", "$color{$sipID}"), "$timeGMT.$timeMicroSec" ,  $srcAddress, " -> ", $dstAddress,  $srcNum{$sipID}, " -> ", $dstNum{$sipID} ,$sipCSeq, $sipCommand, $sipID;
+
+  if ($sipIdList !~ /,/) {
+    while( ($id, $timeGMT, $timeMicroSec, $srcAddress, $dstAddress, $sipID, $sipFrom, $sipTo, $sipUserAgent, $sipCSeq, $sipCommand, $sipData) = $sth->fetchrow_array() ) {
+      $sipCommand =~ s/;.* / / if ! $opt{f};
+    #  printf ("%-25s %-44s %-20s %20s\n", "Time", $foundUsersIP[$chosenID], $myIP, "CSeq") if ($pageLine == 0);
+      if ( $srcAddress =~ /^${myIP}$/ ) {
+       printf colored ("%-25s %-18s %-64s %-18s %-20s %-64s\n", "green"), $timeGMT, $srcAddress, "$sipCommand  ---->", "   $dstAddress", "CSeq:$sipCSeq", $sipID;
+  #    printf ("%-25s %-18s %5s %-18s  %-64s\n", $timeGMT , $srcAddress, " -> ", $dstAddress,  $sipCommand);
       } else {
-        printf ("%-31s %-15s %4s %-18s %-15s %5s %-15s %-12s %-64.64s %-64s\n", "$timeGMT.$timeMicroSec" ,  $srcAddress, " -> ", $dstAddress, $srcNum{$sipID}, " -> ", $dstNum{$sipID}, $sipCSeq, $sipCommand, $sipID);
-      } 
-    } else {
-      if ( ! $opt{m} ){
-        printf colored ("%-25s %-15s %4s %-18s %-15s %5s %-15s %-12s %-64.64s %-64s\n", "$color{$sipID}"), $timeGMT ,  $srcAddress, " -> ", $dstAddress,  $srcNum{$sipID}, " -> ", $dstNum{$sipID} ,$sipCSeq, $sipCommand, $sipID;
+       printf colored ("%-25s %-18s %64s %-18s %-20s %-64s\n", "magenta"), $timeGMT, $dstAddress, "  <---- $sipCommand", "   $srcAddress", "CSeq:$sipCSeq", $sipID;
+      }
+    }
+  } else {
+    while( ($id, $timeGMT, $timeMicroSec, $srcAddress, $dstAddress, $sipID, $sipFrom, $sipTo, $sipUserAgent, $sipCSeq, $sipCommand, $sipData) = $sth->fetchrow_array() ) {
+      $sipCommand =~ s/;.* / / if ! $opt{f};
+      if ( $opt{p} ) {
+        if ( ! $opt{m} ){
+          printf colored ("%-31s %-15s %4s %-18s %-15s %5s %-15s %-12s %-64.64s %-64s\n", "$color{$sipID}"), "$timeGMT.$timeMicroSec" ,  $srcAddress, " -> ", $dstAddress,  $srcNum{$sipID}, " -> ", $dstNum{$sipID} ,$sipCSeq, $sipCommand, $sipID;
+        } else {
+          printf ("%-31s %-15s %4s %-18s %-15s %5s %-15s %-12s %-64.64s %-64s\n", "$timeGMT.$timeMicroSec" ,  $srcAddress, " -> ", $dstAddress, $srcNum{$sipID}, " -> ", $dstNum{$sipID}, $sipCSeq, $sipCommand, $sipID);
+        } 
       } else {
-        printf ("%-25s %-15s %4s %-18s %-15s %5s %-15s %-12s %-64.64s %-64s\n", $timeGMT ,  $srcAddress, " -> ", $dstAddress, $srcNum{$sipID}, " -> ", $dstNum{$sipID}, $sipCSeq, $sipCommand, $sipID);
-      } 
+        if ( ! $opt{m} ){
+          printf colored ("%-25s %-15s %4s %-18s %-15s %5s %-15s %-12s %-64.64s %-64s\n", "$color{$sipID}"), $timeGMT ,  $srcAddress, " -> ", $dstAddress,  $srcNum{$sipID}, " -> ", $dstNum{$sipID} ,$sipCSeq, $sipCommand, $sipID;
+        } else {
+          printf ("%-25s %-15s %4s %-18s %-15s %5s %-15s %-12s %-64.64s %-64s\n", $timeGMT ,  $srcAddress, " -> ", $dstAddress, $srcNum{$sipID}, " -> ", $dstNum{$sipID}, $sipCSeq, $sipCommand, $sipID);
+        } 
+      }
     }
   }
   $sth->finish;
