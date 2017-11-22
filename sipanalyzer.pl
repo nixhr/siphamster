@@ -10,7 +10,7 @@ use Net::Pcap qw(:functions);
 use NetPacket::Ethernet qw(:strip);
 use NetPacket::IP;
 use NetPacket::UDP;
-use HTML::Entities;
+#use HTML::Entities;
 use Time::HiRes qw(gettimeofday tv_interval);
 use Config::Tiny;
 use Getopt::Std;
