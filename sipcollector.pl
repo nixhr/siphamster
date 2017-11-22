@@ -6,11 +6,12 @@ use warnings;
 # libs
 use DBI;
 use DateTime;
-use Net::Pcap qw(:functions);
+#use Net::Pcap qw(:functions);
+use Net::Pcap; 
 use NetPacket::Ethernet qw(:strip);
 use NetPacket::IP;
 use NetPacket::UDP;
-use HTML::Entities;
+#use HTML::Entities;
 use Time::HiRes qw(gettimeofday tv_interval);
 use Config::Tiny;
 use Getopt::Std;
@@ -134,8 +135,10 @@ sub process_packet {
   return unless $sip_call;
 
   # store packet to sip_log
+  $tymd=$time->ymd;
+  $thms=$time->hms;
   $sth_addpacket->execute(
-    "$time->ymd $time->hms", $time->microsecond, $ip->{src_ip}, $udp->{src_port},
+    "$tymd $thms", $time->microsecond, $ip->{src_ip}, $udp->{src_port},
     $ip->{dest_ip}, $udp->{dest_port}, $sip_call, $sip_cseq, $sip_from, $sip_to, $sip_useragent, $sip_command, $udp->{data}
   );
 
